@@ -1,3 +1,5 @@
+# My gram documentation https://docs.google.com/document/d/1vtrNHBXQulX_az6LZcDq4uvsVME3OZoSS_YksGkpb1s/edit?usp=sharing
+# done till 2hr
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
