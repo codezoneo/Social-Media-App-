@@ -11,14 +11,14 @@ import { SignupValidation } from "@/lib/validation";
 import { z } from "zod";
 import Loader from "@/components/shared/Loader";
 import { createUserAccount } from "@/lib/appwrite/api";
-// import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 // import { useCreateUserAccount, useSignInAccount } from "@/lib/react-query/queries";
 // import { SignupValidation } from "@/lib/validation";
 // import { useUserContext } from "@/context/AuthContext";
 
 const SignupForm = () => {
-  // const { toast } = useToast();
+  const { toast } = useToast();
   // const navigate = useNavigate();
   // const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
   const isLoading=false;
@@ -42,10 +42,11 @@ const SignupForm = () => {
   //   try {
       const newUser = await createUserAccount(values);
     console.log(newUser)
-  //     if (!newUser) {
-  //       toast({ title: "Sign up failed. Please try again.", });
+      if (!newUser) {
+        toast({ title: "Sign up failed. Please try again.", });
         
-  //       return;
+        return;
+      }
       }
 
   //     const session = await signInAccount({
