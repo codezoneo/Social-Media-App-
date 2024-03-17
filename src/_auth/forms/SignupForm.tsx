@@ -10,18 +10,18 @@ import { Button } from "@/components/ui/button";
 import { SignupValidation } from "@/lib/validation";
 import { z } from "zod";
 import Loader from "@/components/shared/Loader";
-import { createUserAccount } from "@/lib/appwrite/api";
+import { createUserAccount, signInAccount } from "@/lib/appwrite/api";
 import { useToast } from "@/components/ui/use-toast";
 
-// import { useCreateUserAccount, useSignInAccount } from "@/lib/react-query/queries";
+import { useCreateUserAccount, useSignInAccount } from "@/lib/react-query/queriesAndMutations";
 // import { SignupValidation } from "@/lib/validation";
 // import { useUserContext } from "@/context/AuthContext";
 
 const SignupForm = () => {
   const { toast } = useToast();
-  // const navigate = useNavigate();
-  // const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
-  const isLoading=false;
+  const navigate = useNavigate();
+  const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
+  // const isLoading=false;
 
   const form = useForm<z.infer<typeof SignupValidation>>({
     resolver: zodResolver(SignupValidation),
@@ -33,13 +33,13 @@ const SignupForm = () => {
     },
   });
 
-  // // Queries
-  // const { mutateAsync: createUserAccount, isLoading: isCreatingAccount } = useCreateUserAccount();
+  // Queries
+  const { mutateAsync: createUserAccount, isLoading: isCreatingAccount } = useCreateUserAccount();
   // const { mutateAsync: signInAccount, isLoading: isSigningInUser } = useSignInAccount();
 
   // // Handler
   async function onSubmit(values: z.infer<typeof SignupValidation>)  {
-  //   try {
+    try {
       const newUser = await createUserAccount(values);
     console.log(newUser)
       if (!newUser) {
@@ -47,36 +47,36 @@ const SignupForm = () => {
         
         return;
       }
+      
+
+      const session = await signInAccount({
+        email: values.email,
+        password: values.password,
+      });
+
+      if (!session) {
+        toast({ title: "Something went wrong. Please login your new account", });
+        
+        navigate("/sign-in");
+        
+        return;
       }
 
-  //     const session = await signInAccount({
-  //       email: user.email,
-  //       password: user.password,
-  //     });
+      const isLoggedIn = await checkAuthUser();
 
-  //     if (!session) {
-  //       toast({ title: "Something went wrong. Please login your new account", });
+      if (isLoggedIn) {
+        form.reset();
+
+        navigate("/");
+      } else {
+        toast({ title: "Login failed. Please try again.", });
         
-  //       navigate("/sign-in");
-        
-  //       return;
-  //     }
-
-  //     const isLoggedIn = await checkAuthUser();
-
-  //     if (isLoggedIn) {
-  //       form.reset();
-
-  //       navigate("/");
-  //     } else {
-  //       toast({ title: "Login failed. Please try again.", });
-        
-  //       return;
-  //     }
-  //   } catch (error) {
-  //     console.log({ error });
-  //   }
-  // };
+        return;
+      }
+    } catch (error) {
+      console.log({ error });
+    }
+  };
 
   return (
     <Form {...form}>
